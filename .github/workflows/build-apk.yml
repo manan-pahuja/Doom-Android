@@ -20,24 +20,15 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - name: Install Android SDK Components (NDK & CMake)
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK and CMake
         run: |
-          echo "y" | sudo ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --install "ndk;25.2.9519653" "cmake;3.22.1"
+          sdkmanager "ndk;25.2.9519653" "cmake;3.22.1"
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Accept Android Licenses
-        run: |
-          mkdir -p $ANDROID_SDK_ROOT/licenses
-          echo "24333f8a43b682521c55fb109d9b0449688c6b47" > $ANDROID_SDK_ROOT/licenses/android-sdk-license
-          echo "84831b9409646a918e30573bab4c9c91346d8abd" > $ANDROID_SDK_ROOT/licenses/android-sdk-preview-license
-
       - name: Build Debug APK
-        run: ./gradlew assembleDebug
-
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: doom-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+        run: ./gradlew assembleDebug --info
